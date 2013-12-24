@@ -16,7 +16,8 @@ public class BacklightActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.main);
-        ((SeekBar) this.findViewById(R.id.seekBar)).setOnSeekBarChangeListener(new BacklightAdjuster());
+        final SeekBar seekBar = (SeekBar) this.findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(new BacklightAdjuster(seekBar.getMax()));
     }
 
 }

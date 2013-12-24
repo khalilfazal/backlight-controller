@@ -9,13 +9,37 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 public class BacklightAdjuster implements OnSeekBarChangeListener {
 
     /**
+     * The max.
+     */
+    private final int max;
+
+    /**
+     * Instantiates a new backlight adjuster.
+     *
+     * @param max the max
+     */
+    public BacklightAdjuster(final int max) {
+        this.max = max;
+    }
+
+    /**
      * progress = [0 .. 10000]
      * 
      * @see android.widget.SeekBar.OnSeekBarChangeListener#onProgressChanged(android.widget.SeekBar, int, boolean)
      */
     @Override
     public void onProgressChanged(final SeekBar seekBar, final int level, final boolean fromUser) {
-        new SendBrightness((double) level / seekBar.getMax()).start();
+        new SendBrightness(this.getProgress(level)).start();
+    }
+
+    /**
+     * Gets the progress.
+     *
+     * @param level the level
+     * @return the progress
+     */
+    private double getProgress(final int level) {
+        return Math.pow(this.max, (double) level / this.max - 1);
     }
 
     /**
