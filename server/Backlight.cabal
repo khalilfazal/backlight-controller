@@ -12,11 +12,12 @@ executable backlight-server
     main-is: Main.hs
     ghc-options: -Wall -optc-O3
     build-depends: base >= 4.6.0.1,
+                   filepath,
+                   comonad,
                    concurrent-extra,
                    mmorph,
-                   text,
-                   filepath,
-                   scotty
+                   scotty,
+                   text
 
 source-repository head
     type: git

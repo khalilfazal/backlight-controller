@@ -2,6 +2,7 @@
 module Main (main) where
 
 import           Control.Concurrent.Lock      (Lock, new, with)
+import           Control.Comonad              (($>))
 import           Control.Monad                ((>=>))
 import           Control.Monad.Morph          (lift)
 import qualified Data.Text.Lazy          as T (Text, append)
@@ -24,7 +25,7 @@ interpret :: T.Text -> IO Double
 interpret = flip either return . returnError >>= (. parseParam)
 
 returnError :: T.Text -> T.Text -> IO Double
-returnError e = (>> return 2) . (>> putError e) . T.putStr
+returnError e = ($> 2) . (>> putError e) . T.putStr
 
 putError :: T.Text -> IO ()
 putError = T.putStrLn . (": \"" `T.append`) . (`T.append` "\"")
