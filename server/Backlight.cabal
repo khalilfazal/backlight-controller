@@ -1,0 +1,24 @@
+name:          Backlight
+version:       0.0
+synopsis:      Control a computer monitor's backlight remotely
+author:        Khalil Fazal <khalil.fazal.0@gmail.com>
+maintainer:    Khalil Fazal <khalil.fazal.0@gmail.com>
+category:      System
+build-type:    Simple
+cabal-version: >= 1.14
+
+executable backlight-server
+    default-language: Haskell2010
+    main-is: Main.hs
+    ghc-options: -Wall -optc-O3
+    build-depends: base >= 4.6.0.1,
+                   concurrent-extra,
+                   errors,
+                   mmorph,
+                   text,
+                   filepath,
+                   scotty
+
+source-repository head
+    type: git
+    location: https://github.com/capncanuck/backlight-controller
