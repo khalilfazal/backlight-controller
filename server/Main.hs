@@ -14,7 +14,7 @@ main = do
     lock <- new
     scotty 3000 $
         post "/:brightness" $
-            param "brightness" >>= lift . change lock . percentage m . interpret
+            param "brightness" >>= lift . change lock . portionOf m . interpret
 
 maxBrightness :: IO Int
 maxBrightness = (fmap read . readFile) fMax
@@ -36,6 +36,6 @@ base        = "/sys/class/backlight/intel_backlight"
 fMax        = base </> "max_brightness"
 fBrightness = base </> "brightness"
 
-percentage :: RealFrac a => a -> a -> Maybe Integer
-percentage m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
+portionOf :: RealFrac a => a -> a -> Maybe Integer
+portionOf m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
                | otherwise        = Nothing
