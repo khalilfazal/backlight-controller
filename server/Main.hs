@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Main where
+module Main (main) where
 
 import Control.Concurrent.Lock (Lock, new, with)
 import Control.Error.Safe      (rightZ)
