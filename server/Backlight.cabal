@@ -13,7 +13,6 @@ executable backlight-server
     ghc-options: -Wall -optc-O3
     build-depends: base >= 4.6.0.1,
                    concurrent-extra,
-                   errors,
                    mmorph,
                    text,
                    filepath,

@@ -1,12 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main (main) where
 
-import Control.Concurrent.Lock (Lock, new, with)
-import Control.Error.Safe      (rightZ)
-import Control.Monad.Morph     (lift)
-import Data.Text.Lazy          (Text)
-import System.FilePath         ((</>))
-import Web.Scotty              (post, scotty, param, parseParam)
+import           Control.Concurrent.Lock      (Lock, new, with)
+import           Control.Monad                ((>=>))
+import           Control.Monad.Morph          (lift)
+import qualified Data.Text.Lazy          as T (Text, append)
+import qualified Data.Text.Lazy.IO       as T (putStr, putStrLn)
+import           System.FilePath              ((</>))
+import           Web.Scotty                   (post, scotty, param, parseParam)
 
 main :: IO ()
 main = do
@@ -14,13 +15,19 @@ main = do
     lock <- new
     scotty 3000 $
         post "/:brightness" $
-            param "brightness" >>= lift . change lock . portionOf m . interpret
+            param "brightness" >>= lift . (interpret >=> change lock . portionOf m)
 
 maxBrightness :: IO Int
 maxBrightness = (fmap read . readFile) fMax
 
-interpret :: Text -> Double
-interpret = head . rightZ . parseParam
+interpret :: T.Text -> IO Double
+interpret = flip either return . returnError >>= (. parseParam)
+
+returnError :: T.Text -> T.Text -> IO Double
+returnError e = (>> return 2) . (>> putError e) . T.putStr
+
+putError :: T.Text -> IO ()
+putError = T.putStrLn . (": \"" `T.append`) . (`T.append` "\"")
 
 portionOf :: RealFrac a => a -> a -> Maybe Integer
 portionOf m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
