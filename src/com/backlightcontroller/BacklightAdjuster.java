@@ -14,22 +14,30 @@ public class BacklightAdjuster implements OnSeekBarChangeListener {
     private final int max;
 
     /**
+     * The hostname.
+     */
+    private final String hostname;
+
+    /**
      * Instantiates a new backlight adjuster.
      *
+     * @param hostname the hostname
      * @param max the max
      */
-    public BacklightAdjuster(final int max) {
+    public BacklightAdjuster(final String hostname, final int max) {
         this.max = max;
+        this.hostname = hostname;
     }
 
     /**
      * progress = [0 .. 10000]
+     * See R.id.seekBar "max" attribute
      * 
      * @see android.widget.SeekBar.OnSeekBarChangeListener#onProgressChanged(android.widget.SeekBar, int, boolean)
      */
     @Override
     public void onProgressChanged(final SeekBar seekBar, final int level, final boolean fromUser) {
-        new SendBrightness(this.getProgress(level)).start();
+        new SendBrightness(this.hostname, this.getProgress(level)).start();
     }
 
     /**
@@ -53,5 +61,4 @@ public class BacklightAdjuster implements OnSeekBarChangeListener {
      */
     @Override
     public void onStopTrackingTouch(final SeekBar seekBar) {}
-
 }
