@@ -38,4 +38,4 @@ fBrightness = base </> "brightness"
 
 portionOf :: RealFrac a => a -> a -> Maybe Integer
 portionOf m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
-               | otherwise        = Nothing
+              | otherwise        = Nothing
