@@ -38,4 +38,4 @@ fBrightness = base </> "brightness"
 
 percentage :: RealFrac a => a -> a -> Maybe Integer
 percentage m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
-               | otherwise       = Nothing
+               | otherwise        = Nothing
