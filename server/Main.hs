@@ -6,7 +6,7 @@ import Control.Error.Safe      (rightZ)
 import Control.Monad.Morph     (lift)
 import Data.Text.Lazy          (Text)
 import System.FilePath         ((</>))
-import Web.Scotty              (Parsable, post, scotty, param, parseParam)
+import Web.Scotty              (post, scotty, param, parseParam)
 
 main :: IO ()
 main = do
