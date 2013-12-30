@@ -22,6 +22,10 @@ maxBrightness = (fmap read . readFile) fMax
 interpret :: Text -> Double
 interpret = head . rightZ . parseParam
 
+portionOf :: RealFrac a => a -> a -> Maybe Integer
+portionOf m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
+              | otherwise        = Nothing
+
 change :: Show a => Lock -> Maybe a -> IO ()
 change = maybeM . (. show) . write
 
@@ -35,7 +39,3 @@ base, fMax, fBrightness :: FilePath
 base        = "/sys/class/backlight/intel_backlight"
 fMax        = base </> "max_brightness"
 fBrightness = base </> "brightness"
-
-portionOf :: RealFrac a => a -> a -> Maybe Integer
-portionOf m x | x >= 0 && x <= 1 = (Just . round . (* m)) x
-              | otherwise        = Nothing
