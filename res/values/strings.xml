@@ -5,7 +5,7 @@
     <!-- Hostname Dialog -->
     <string name="hostnameTitle">Set Hostname</string>
     <string name="hostnameMessage">Set the hostname of the computer to control</string>
-    <string name="hostnameHint">0.0.0.0</string>
+    <string name="hostnameHint">(www.example.com) or (0.0.0.0)</string>
     <string name="hostnameSet">Set</string>
 
 </resources>

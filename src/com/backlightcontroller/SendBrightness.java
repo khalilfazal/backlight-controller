@@ -29,9 +29,9 @@ public class SendBrightness extends Thread {
      * @param brightness the brightness
      */
     public SendBrightness(final String hostname, final double brightness) {
-        this.setName(this.getClass().getSimpleName());
-
+        final String name = this.getClass().getSimpleName();
         final String uri = String.format(Locale.CANADA, "%s%s%s%f", "http://", hostname, ":3000/", brightness);
+        this.setName(String.format(Locale.CANADA, "%s%s%s", name, " ", uri));
         this.requestURI = new HttpPost(uri);
     }
 
