@@ -1,6 +1,9 @@
 package com.backlightcontroller;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -10,6 +13,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -17,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
@@ -66,14 +72,14 @@ public class BacklightActivity extends Activity {
     private String hostname;
 
     /**
-     * The preferences.
-     */
-    protected SharedPreferences preferences;
-
-    /**
      * The hostnames.
      */
     private Set<String> hostnames;
+
+    /**
+     * The preferences.
+     */
+    protected SharedPreferences preferences;
 
     /**
      * On create.
@@ -99,7 +105,7 @@ public class BacklightActivity extends Activity {
     protected void onResume() {
         super.onResume();
         this.seekBar.setProgress(this.preferences.getInt(_brightness, this.max));
-        this.hostnames = new TreeSet<String>(this.preferences.getStringSet(_hostnames, new TreeSet<String>()));
+        this.hostnames = new TreeSet<String>(this.preferences.getStringSet(_hostnames, Collections.<String> emptySet()));
         this.addListener(this.preferences.getString(_hostname, ""));
     }
 
@@ -114,53 +120,7 @@ public class BacklightActivity extends Activity {
             final OnSeekBarChangeListener listener = new BacklightAdjuster(this.hostname, this.max);
             this.seekBar.setOnSeekBarChangeListener(listener);
         } else {
-            final AutoCompleteTextView input = (AutoCompleteTextView) this.getLayoutInflater().inflate(R.layout.input_hostname, null);
-            final String[] aHostnames = this.hostnames.toArray(new String[this.hostnames.size()]);
-            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, aHostnames);
-            input.setAdapter(adapter);
-
-            final InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-
-            input.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(final View v, final MotionEvent event) {
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    input.showDropDown();
-                    return true;
-                }
-            });
-
-            input.setOnDismissListener(new OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    imm.showSoftInput(input, 0);
-                }
-            });
-
-            final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog, final int which) {
-                    BacklightActivity.this.addListener(input.getText().toString());
-                }
-            };
-
-            final AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle(R.string.hostnameTitle)
-                    .setMessage(R.string.hostnameMessage)
-                    .setView(input)
-                    .setNeutralButton(R.string.hostnameSet, listener)
-                    .create();
-
-            input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(final View v, final boolean hasFocus) {
-                    if (hasFocus) {
-                        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                    }
-                }
-            });
-
-            dialog.show();
+            this.promptHostname();
         }
     }
 
@@ -186,6 +146,69 @@ public class BacklightActivity extends Activity {
     }
 
     /**
+     * Gets the hostname.
+     */
+    private void promptHostname() {
+        final AutoCompleteTextView input = this.hostnameInput();
+        final List<String> hostnameList = new ArrayList<String>(this.hostnames);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, hostnameList);
+        input.setAdapter(adapter);
+
+        final OnClickListener listener = new OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, final int which) {
+                BacklightActivity.this.addListener(input.getText().toString());
+            }
+        };
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.hostnameTitle)
+                .setMessage(R.string.hostnameMessage)
+                .setView(input)
+                .setNeutralButton(R.string.hostnameSet, listener)
+                .create();
+
+        input.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(final View v, final boolean hasFocus) {
+                if (hasFocus) {
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Gets the text field.
+     *
+     * @return the text field
+     */
+    private AutoCompleteTextView hostnameInput() {
+        final AutoCompleteTextView input = (AutoCompleteTextView) this.getLayoutInflater().inflate(R.layout.input_hostname, null);
+        final InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        input.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(final View v, final MotionEvent event) {
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                input.showDropDown();
+                return true;
+            }
+        });
+
+        input.setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                imm.showSoftInput(input, 0);
+            }
+        });
+
+        return input;
+    }
+
+    /**
      * On pause.
      *
      * @see android.app.Activity#onPause()
@@ -196,8 +219,8 @@ public class BacklightActivity extends Activity {
 
         final Editor editor = this.preferences.edit();
         editor.putInt(_brightness, this.seekBar.getProgress());
-        editor.putString(_hostname, this.hostname);
         editor.putStringSet(_hostnames, this.hostnames);
+        editor.putString(_hostname, this.hostname);
         editor.commit();
     }
 
