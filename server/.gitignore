@@ -1,2 +1,4 @@
 backlight-server
 dist/
+cabal.sandbox.config
+.cabal-sandbox

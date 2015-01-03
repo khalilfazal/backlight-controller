@@ -13,7 +13,7 @@ executable backlight-server
     ghc-options: -Wall -optc-O3
     build-depends: base >= 4.6.0.1,
                    filepath,
-                   comonad < 3.0.2,
+                   comonad,
                    concurrent-extra,
                    mmorph,
                    scotty > 0.5.0,
